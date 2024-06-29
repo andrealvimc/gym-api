@@ -17,7 +17,9 @@ export async function Register(request: FastifyRequest, reply: FastifyReply) {
     const usersRepository = new PrismaUsersRepository();
     const registerUseCase = new RegisterUseCase(usersRepository);
 
-    await registerUseCase.execute({ name, email, password });
+    const { user } = await registerUseCase.execute({ name, email, password });
+
+    // return user;
   } catch (e) {
     if (e instanceof UserAlreadyExistsError) {
       return reply.status(409).send({ message: e.message });
