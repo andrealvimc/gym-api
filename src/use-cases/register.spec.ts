@@ -1,15 +1,20 @@
 import { compare } from "bcryptjs";
 import { PrismaUsersRepository } from "@/repositories/prisma/prisma-users.repository";
-import { test, expect, describe, it } from "vitest";
+import { test, expect, describe, it, beforeEach } from "vitest";
 import { RegisterUseCase } from "./register.use-case";
 import { InMemoryUsersRepository } from "@/repositories/in-memory/in-memory-users.repository";
 import { UserAlreadyExistsError } from "./errors/user-already-exists.error";
 
-describe("Register UseCase", () => {
-  it("should be able to register", async () => {
-    const usersRepository = new InMemoryUsersRepository();
-    const sut = new RegisterUseCase(usersRepository);
+let usersRepository: InMemoryUsersRepository;
+let sut: RegisterUseCase;
 
+describe("Register UseCase", () => {
+  beforeEach(() => {
+    usersRepository = new InMemoryUsersRepository();
+    sut = new RegisterUseCase(usersRepository);
+  });
+
+  it("should be able to register", async () => {
     const { user } = await sut.execute({
       name: "John Doe",
       email: "john@alvim.net",
@@ -20,9 +25,6 @@ describe("Register UseCase", () => {
   });
 
   it("should hash user password upon registration", async () => {
-    const usersRepository = new InMemoryUsersRepository();
-    const sut = new RegisterUseCase(usersRepository);
-
     const { user } = await sut.execute({
       name: "John Doe",
       email: "john@alvim.net",
@@ -38,9 +40,6 @@ describe("Register UseCase", () => {
   });
 
   it("should not be able to register with same email twice", async () => {
-    const usersRepository = new InMemoryUsersRepository();
-    const sut = new RegisterUseCase(usersRepository);
-
     const email = "john@alvim.net";
 
     await sut.execute({
